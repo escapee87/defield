@@ -18,6 +18,7 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 
 const registrationSchema = z.object({
   teamName: z.string().min(2, { message: 'Team name must be at least 2 characters.' }),
@@ -88,15 +89,27 @@ export function CoachView() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1.5">
-                      <Users className="h-4 w-4" />
-                      Registered Teams
-                    </span>
-                    <span>{session.registrations.length} / {session.capacity}</span>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1.5">
+                        <Users className="h-4 w-4" />
+                        Registered Teams
+                      </span>
+                      <span>{session.registrations.length} / {session.capacity}</span>
+                    </div>
+                    <Progress value={progressValue} aria-label={`${progressValue}% full`} />
                   </div>
-                  <Progress value={progressValue} aria-label={`${progressValue}% full`} />
+                  {session.registrations.length > 0 && (
+                    <div className="pt-2">
+                      <h4 className="text-sm font-medium mb-2 text-foreground">Registered Teams:</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {session.registrations.map(reg => (
+                          <Badge key={reg.id} variant="secondary" className="font-normal">{reg.teamName}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
               <CardFooter>
