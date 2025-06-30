@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/use-auth';
+import { LogOut } from 'lucide-react';
 
 const navItems = [
   { href: '/coach', label: 'Coach' },
@@ -13,6 +15,7 @@ const navItems = [
 
 export function Header() {
   const pathname = usePathname();
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <header className="bg-card/95 backdrop-blur-sm border-b sticky top-0 z-40">
@@ -52,6 +55,17 @@ export function Header() {
               <Link href={item.href}>{item.label}</Link>
             </Button>
           ))}
+          {isAuthenticated && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={logout}
+              className="text-muted-foreground hover:text-primary"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          )}
         </nav>
       </div>
     </header>
