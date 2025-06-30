@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Shield, ClipboardCheck, ArrowRight } from 'lucide-react';
+import { Users, Shield, ClipboardCheck, ArrowRight, FileText } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -16,7 +16,7 @@ export default function Home() {
         </p>
       </div>
 
-      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="w-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <Card className="hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
           <CardHeader>
             <div className="flex justify-center mb-4">
@@ -74,6 +74,26 @@ export default function Home() {
             </CardDescription>
             <Button asChild className="w-full">
               <Link href="/monitor">Go to Monitor View <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
+          </CardContent>
+        </Card>
+        <Card className="hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+          <CardHeader>
+            <div className="flex justify-center mb-4">
+              <div className="bg-primary/10 p-4 rounded-full">
+                <FileText className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-center">
+              Field Reports
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex-grow flex flex-col">
+            <CardDescription className="text-center mb-6 flex-grow">
+              Submit a report on field conditions, ratings, and any issues.
+            </CardDescription>
+            <Button asChild className="w-full">
+              <Link href="/report">Submit a Report <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </CardContent>
         </Card>

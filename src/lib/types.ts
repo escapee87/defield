@@ -15,3 +15,10 @@ export interface Session {
   registrations: Registration[];
   status: 'active' | 'cancelled';
 }
+
+export interface FieldReport {
+  id: string;
+  rating: number;
+  comments?: string;
+  submittedAt: Date;
+}

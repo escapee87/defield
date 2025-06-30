@@ -2,7 +2,7 @@
 
 import React, { createContext, useState, useCallback } from 'react';
 import { initialSessions } from '@/lib/data';
-import type { Session, Registration } from '@/lib/types';
+import type { Session, Registration, FieldReport } from '@/lib/types';
 
 interface SessionContextType {
   sessions: Session[];
@@ -10,12 +10,15 @@ interface SessionContextType {
   cancelSession: (sessionId: string) => 'cancelled' | 'removed';
   registerTeam: (sessionId: string, registrationDetails: Omit<Registration, 'id' | 'checkedIn'>) => void;
   checkInTeam: (sessionId: string, registrationId: string) => string | undefined;
+  fieldReports: FieldReport[];
+  submitFieldReport: (data: Omit<FieldReport, 'id' | 'submittedAt'>) => void;
 }
 
 export const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [sessions, setSessions] = useState<Session[]>(initialSessions);
+  const [fieldReports, setFieldReports] = useState<FieldReport[]>([]);
 
   const createSession = useCallback((date: Date, time: string) => {
     const newSession: Session = {
@@ -84,7 +87,16 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return teamName;
   }, []);
 
-  const value = { sessions, createSession, cancelSession, registerTeam, checkInTeam };
+  const submitFieldReport = useCallback((data: Omit<FieldReport, 'id' | 'submittedAt'>) => {
+    const newReport: FieldReport = {
+      id: `rep_${new Date().getTime()}`,
+      ...data,
+      submittedAt: new Date(),
+    };
+    setFieldReports(prev => [...prev, newReport]);
+  }, []);
+
+  const value = { sessions, createSession, cancelSession, registerTeam, checkInTeam, fieldReports, submitFieldReport };
 
   return (
     <SessionContext.Provider value={value}>

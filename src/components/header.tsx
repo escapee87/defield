@@ -11,6 +11,7 @@ const navItems = [
   { href: '/coach', label: 'Coach' },
   { href: '/admin', label: 'Admin' },
   { href: '/monitor', label: 'Monitor' },
+  { href: '/report', label: 'Report' },
 ];
 
 export function Header() {
