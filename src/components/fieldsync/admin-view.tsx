@@ -21,6 +21,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Badge } from '../ui/badge';
 
 const sessionSchema = z.object({
   date: z.date({ required_error: 'A date is required.' }),
@@ -48,6 +49,7 @@ export function AdminView() {
         time: values.time,
         capacity: 6,
         registrations: [],
+        status: 'active',
       };
       setSessions(prev => [...prev, newSession].sort((a, b) => a.date.getTime() - b.date.getTime()));
       toast({
@@ -61,12 +63,26 @@ export function AdminView() {
 
   const handleCancelSession = (sessionId: string) => {
     const sessionToCancel = sessions.find(s => s.id === sessionId);
-    setSessions(prev => prev.filter(s => s.id !== sessionId));
-    toast({
-      variant: 'destructive',
-      title: 'Session Cancelled',
-      description: `The session on ${format(sessionToCancel!.date, 'MMMM d')} has been cancelled. Registered teams will be notified.`,
-    });
+    if (!sessionToCancel) return;
+
+    if (sessionToCancel.registrations.length > 0) {
+      setSessions(prev =>
+        prev.map(s =>
+          s.id === sessionId ? { ...s, status: 'cancelled' } : s
+        )
+      );
+      toast({
+        title: 'Session Cancelled',
+        description: `The session on ${format(sessionToCancel.date, 'MMMM d')} is marked as cancelled.`,
+      });
+    } else {
+      setSessions(prev => prev.filter(s => s.id !== sessionId));
+      toast({
+        variant: 'destructive',
+        title: 'Session Removed',
+        description: `The empty session on ${format(sessionToCancel.date, 'MMMM d')} has been removed.`,
+      });
+    }
   };
 
   return (
@@ -95,9 +111,14 @@ export function AdminView() {
                             <p className="text-sm text-muted-foreground">{session.time}</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Users className="h-4 w-4" />
-                          <span>{session.registrations.length} / {session.capacity}</span>
+                        <div className="flex items-center gap-4">
+                          {session.status === 'cancelled' && (
+                            <Badge variant="outline" className="text-destructive border-destructive">Cancelled</Badge>
+                          )}
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Users className="h-4 w-4" />
+                            <span>{session.registrations.length} / {session.capacity}</span>
+                          </div>
                         </div>
                       </div>
                     </AccordionTrigger>
@@ -116,7 +137,7 @@ export function AdminView() {
                         )}
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="sm" className="mt-4">
+                            <Button variant="destructive" size="sm" className="mt-4" disabled={session.status === 'cancelled'}>
                               <Trash2 className="mr-2 h-4 w-4" /> Cancel Session
                             </Button>
                           </AlertDialogTrigger>

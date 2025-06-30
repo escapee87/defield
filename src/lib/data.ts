@@ -9,7 +9,8 @@ export const initialSessions: Session[] = [
     registrations: [
       { id: 'reg_10', teamName: 'FC Dynamos', coachName: 'Alex Ray', coachEmail: 'alex@example.com', coachPhone: '111-222-3333', checkedIn: false },
       { id: 'reg_11', teamName: 'City United', coachName: 'Sam Jones', coachEmail: 'sam@example.com', coachPhone: '444-555-6666', checkedIn: true },
-    ]
+    ],
+    status: 'active',
   },
   {
     id: 'ses_1',
@@ -20,6 +21,7 @@ export const initialSessions: Session[] = [
       { id: 'reg_1', teamName: 'FC Eagles', coachName: 'John Smith', coachEmail: 'john@example.com', coachPhone: '123-456-7890', checkedIn: false },
       { id: 'reg_2', teamName: 'City Rovers', coachName: 'Jane Doe', coachEmail: 'jane@example.com', coachPhone: '234-567-8901', checkedIn: false },
     ],
+    status: 'active',
   },
   {
     id: 'ses_2',
@@ -27,6 +29,7 @@ export const initialSessions: Session[] = [
     time: '17:00 - 18:00',
     capacity: 6,
     registrations: [],
+    status: 'active',
   },
   {
     id: 'ses_3',
@@ -41,6 +44,7 @@ export const initialSessions: Session[] = [
         { id: 'reg_7', teamName: 'AFC Giants', coachName: 'Michael Clark', coachEmail: 'michael@example.com', coachPhone: '789-012-3456', checkedIn: false },
         { id: 'reg_8', teamName: 'Sporting Club', coachName: 'Linda Harris', coachEmail: 'linda@example.com', coachPhone: '890-123-4567', checkedIn: false },
     ],
+    status: 'active',
   },
     {
     id: 'ses_4',
@@ -50,5 +54,6 @@ export const initialSessions: Session[] = [
     registrations: [
       { id: 'reg_9', teamName: 'Warriors', coachName: 'Chris Green', coachEmail: 'chris@example.com', coachPhone: '901-234-5678', checkedIn: true },
     ],
+    status: 'active',
   },
 ];

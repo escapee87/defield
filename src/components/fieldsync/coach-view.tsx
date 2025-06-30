@@ -74,52 +74,62 @@ export function CoachView() {
       {sessions.map(session => {
         const isFull = session.registrations.length >= session.capacity;
         const progressValue = (session.registrations.length / session.capacity) * 100;
+        const isCancelled = session.status === 'cancelled';
         
         return (
           <Dialog key={session.id} onOpenChange={(open) => !open && form.reset()}>
-            <Card className="flex flex-col">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-primary">
-                  <CalendarIcon className="h-5 w-5" />
-                  <span>{format(session.date, 'EEEE, MMMM d')}</span>
-                </CardTitle>
-                <CardDescription className="flex items-center gap-2 pt-1">
-                  <Clock className="h-4 w-4" />
-                  <span>{session.time}</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1.5">
-                        <Users className="h-4 w-4" />
-                        Registered Teams
-                      </span>
-                      <span>{session.registrations.length} / {session.capacity}</span>
-                    </div>
-                    <Progress value={progressValue} aria-label={`${progressValue}% full`} />
-                  </div>
-                  {session.registrations.length > 0 && (
-                    <div className="pt-2">
-                      <h4 className="text-sm font-medium mb-2 text-foreground">Registered Teams:</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {session.registrations.map(reg => (
-                          <Badge key={reg.id} variant="secondary" className="font-normal">{reg.teamName}</Badge>
-                        ))}
+            <Card className="flex flex-col relative overflow-hidden">
+              <div className={cn('flex flex-col flex-grow', isCancelled && 'opacity-40')}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-primary">
+                    <CalendarIcon className="h-5 w-5" />
+                    <span>{format(session.date, 'EEEE, MMMM d')}</span>
+                  </CardTitle>
+                  <CardDescription className="flex items-center gap-2 pt-1">
+                    <Clock className="h-4 w-4" />
+                    <span>{session.time}</span>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1.5">
+                          <Users className="h-4 w-4" />
+                          Registered Teams
+                        </span>
+                        <span>{session.registrations.length} / {session.capacity}</span>
                       </div>
+                      <Progress value={progressValue} aria-label={`${progressValue}% full`} />
                     </div>
-                  )}
+                    {session.registrations.length > 0 && (
+                      <div className="pt-2">
+                        <h4 className="text-sm font-medium mb-2 text-foreground">Registered Teams:</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {session.registrations.map(reg => (
+                            <Badge key={reg.id} variant="secondary" className="font-normal">{reg.teamName}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <DialogTrigger asChild>
+                    <Button variant={isFull || isCancelled ? "secondary" : "destructive"} disabled={isFull || isCancelled} className="w-full">
+                      {isCancelled ? 'Cancelled' : isFull ? 'Session Full' : 'Register Team'}
+                      {!isFull && !isCancelled && <ArrowRight className="ml-2 h-4 w-4" />}
+                    </Button>
+                  </DialogTrigger>
+                </CardFooter>
+              </div>
+
+              {isCancelled && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center p-4 pointer-events-none">
+                  <div className="absolute w-[120%] h-0.5 bg-destructive/80 rotate-[-15deg]" />
+                  <Badge variant="destructive" className="text-sm font-semibold px-3 py-1 shadow-lg">CANCELLED</Badge>
                 </div>
-              </CardContent>
-              <CardFooter>
-                <DialogTrigger asChild>
-                  <Button variant={isFull ? "secondary" : "destructive"} disabled={isFull} className="w-full">
-                    {isFull ? 'Session Full' : 'Register Team'}
-                    {!isFull && <ArrowRight className="ml-2 h-4 w-4" />}
-                  </Button>
-                </DialogTrigger>
-              </CardFooter>
+              )}
             </Card>
 
             <DialogContent className="sm:max-w-[425px]">

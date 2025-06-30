@@ -13,4 +13,5 @@ export interface Session {
   time: string;
   capacity: number;
   registrations: Registration[];
+  status: 'active' | 'cancelled';
 }
