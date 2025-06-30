@@ -5,15 +5,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Clock, Users, Trash2, PlusCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Users, Trash2, PlusCircle, Loader2 } from 'lucide-react';
 
-import { initialSessions } from '@/lib/data';
-import type { Session } from '@/lib/types';
+import { useSessions } from '@/hooks/use-sessions';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
@@ -31,7 +30,7 @@ const sessionSchema = z.object({
 });
 
 export function AdminView() {
-  const [sessions, setSessions] = useState<Session[]>(initialSessions);
+  const { sessions, createSession, cancelSession } = useSessions();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -43,15 +42,7 @@ export function AdminView() {
   const handleCreateSession = (values: z.infer<typeof sessionSchema>) => {
     setIsSubmitting(true);
     setTimeout(() => {
-      const newSession: Session = {
-        id: `ses_${new Date().getTime()}`,
-        date: values.date,
-        time: values.time,
-        capacity: 6,
-        registrations: [],
-        status: 'active',
-      };
-      setSessions(prev => [...prev, newSession].sort((a, b) => a.date.getTime() - b.date.getTime()));
+      createSession(values.date, values.time);
       toast({
         title: 'Session Created!',
         description: `New session on ${format(values.date, 'MMMM d')} at ${values.time} is now available.`,
@@ -65,18 +56,14 @@ export function AdminView() {
     const sessionToCancel = sessions.find(s => s.id === sessionId);
     if (!sessionToCancel) return;
 
-    if (sessionToCancel.registrations.length > 0) {
-      setSessions(prev =>
-        prev.map(s =>
-          s.id === sessionId ? { ...s, status: 'cancelled' } : s
-        )
-      );
+    const result = cancelSession(sessionId);
+
+    if (result === 'cancelled') {
       toast({
         title: 'Session Cancelled',
         description: `The session on ${format(sessionToCancel.date, 'MMMM d')} is marked as cancelled.`,
       });
     } else {
-      setSessions(prev => prev.filter(s => s.id !== sessionId));
       toast({
         variant: 'destructive',
         title: 'Session Removed',

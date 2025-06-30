@@ -7,8 +7,7 @@ import * as z from 'zod';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, Clock, Users, User, Mail, Phone, Loader2, ArrowRight } from 'lucide-react';
 
-import { initialSessions } from '@/lib/data';
-import type { Session, Registration } from '@/lib/types';
+import { useSessions } from '@/hooks/use-sessions';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,7 +27,7 @@ const registrationSchema = z.object({
 });
 
 export function CoachView() {
-  const [sessions, setSessions] = useState<Session[]>(initialSessions);
+  const { sessions, registerTeam } = useSessions();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -46,19 +45,7 @@ export function CoachView() {
     setIsSubmitting(true);
     // Simulate API call
     setTimeout(() => {
-      const newRegistration: Registration = {
-        id: `reg_${new Date().getTime()}`,
-        ...values,
-        checkedIn: false,
-      };
-
-      setSessions(prevSessions =>
-        prevSessions.map(session =>
-          session.id === sessionId
-            ? { ...session, registrations: [...session.registrations, newRegistration] }
-            : session
-        )
-      );
+      registerTeam(sessionId, values);
 
       toast({
         title: "Registration Successful!",

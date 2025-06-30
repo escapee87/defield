@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { initialSessions } from '@/lib/data';
-import type { Session } from '@/lib/types';
+import { useSessions } from '@/hooks/use-sessions';
 import { useToast } from '@/hooks/use-toast';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,7 +14,7 @@ import { Progress } from '@/components/ui/progress';
 import { CheckCircle2, XCircle, Users } from 'lucide-react';
 
 export function MonitorView() {
-  const [sessions, setSessions] = useState<Session[]>(initialSessions);
+  const { sessions, checkInTeam } = useSessions();
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -26,28 +25,13 @@ export function MonitorView() {
   const handleCheckIn = (registrationId: string) => {
     if (!selectedSessionId) return;
 
-    let teamName = '';
-    setSessions(prevSessions =>
-      prevSessions.map(session => {
-        if (session.id === selectedSessionId) {
-          return {
-            ...session,
-            registrations: session.registrations.map(reg => {
-              if (reg.id === registrationId) {
-                teamName = reg.teamName;
-                return { ...reg, checkedIn: true };
-              }
-              return reg;
-            }),
-          };
-        }
-        return session;
-      })
-    );
-    toast({
-        title: 'Team Checked In',
-        description: `${teamName} has been successfully checked in.`,
-    })
+    const teamName = checkInTeam(selectedSessionId, registrationId);
+    if (teamName) {
+        toast({
+            title: 'Team Checked In',
+            description: `${teamName} has been successfully checked in.`,
+        });
+    }
   };
 
   const selectedSession = sessions.find(s => s.id === selectedSessionId);
