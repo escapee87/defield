@@ -19,6 +19,10 @@ export function MonitorView() {
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const todaysSessions = sessions.filter(
+    (session) => session.date.toDateString() === new Date().toDateString()
+  );
+
   const handleCheckIn = (registrationId: string) => {
     if (!selectedSessionId) return;
 
@@ -55,22 +59,28 @@ export function MonitorView() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Select a Session</CardTitle>
+          <CardTitle>Select Today's Session</CardTitle>
           <CardDescription>Choose a session from the dropdown to view and manage attendance.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Select onValueChange={setSelectedSessionId} value={selectedSessionId || ''}>
-            <SelectTrigger className="w-full md:w-[300px]">
-              <SelectValue placeholder="Select a session..." />
-            </SelectTrigger>
-            <SelectContent>
-              {sessions.map(session => (
-                <SelectItem key={session.id} value={session.id}>
-                  {format(session.date, 'EEEE, MMMM d')} @ {session.time}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {todaysSessions.length > 0 ? (
+            <Select onValueChange={setSelectedSessionId} value={selectedSessionId || ''}>
+              <SelectTrigger className="w-full md:w-[300px]">
+                <SelectValue placeholder="Select a session..." />
+              </SelectTrigger>
+              <SelectContent>
+                {todaysSessions.map(session => (
+                  <SelectItem key={session.id} value={session.id}>
+                    {format(session.date, 'EEEE, MMMM d')} @ {session.time}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+             <div className="text-center text-muted-foreground p-4 border border-dashed rounded-md">
+              <p>No sessions scheduled for today.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -2,6 +2,16 @@ import type { Session } from './types';
 
 export const initialSessions: Session[] = [
   {
+    id: 'ses_today',
+    date: new Date(),
+    time: '15:00 - 16:00',
+    capacity: 6,
+    registrations: [
+      { id: 'reg_10', teamName: 'FC Dynamos', coachName: 'Alex Ray', coachEmail: 'alex@example.com', coachPhone: '111-222-3333', checkedIn: false },
+      { id: 'reg_11', teamName: 'City United', coachName: 'Sam Jones', coachEmail: 'sam@example.com', coachPhone: '444-555-6666', checkedIn: true },
+    ]
+  },
+  {
     id: 'ses_1',
     date: new Date(new Date().setDate(new Date().getDate() + 2)),
     time: '16:00 - 17:00',
