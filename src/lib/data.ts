@@ -33,7 +33,7 @@ export const initialSessions: Session[] = [
   },
   {
     id: 'ses_3',
-    date: new Date(new Date().setDate(new Date().getDate() + 4)),
+    date: new Date(new Date().setDate(new Date().getDate() - 4)),
     time: '18:00 - 19:00',
     capacity: 6,
     registrations: [
@@ -48,7 +48,7 @@ export const initialSessions: Session[] = [
   },
     {
     id: 'ses_4',
-    date: new Date(new Date().setDate(new Date().getDate() + 5)),
+    date: new Date(new Date().setDate(new Date().getDate() - 5)),
     time: '19:00 - 20:00',
     capacity: 6,
     registrations: [

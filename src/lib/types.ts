@@ -18,6 +18,7 @@ export interface Session {
 
 export interface FieldReport {
   id: string;
+  sessionId: string;
   rating: number;
   comments?: string;
   submittedAt: Date;
