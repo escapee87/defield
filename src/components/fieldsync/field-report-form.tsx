@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -30,9 +30,9 @@ export function FieldReportForm() {
   const { toast } = useToast();
   const [hoverRating, setHoverRating] = useState(0);
 
-  const pastOrCurrentSessions = sessions
+  const pastOrCurrentSessions = useMemo(() => sessions
     .filter(session => new Date(session.date) <= new Date() && session.registrations.length > 0)
-    .sort((a, b) => b.date.getTime() - a.date.getTime());
+    .sort((a, b) => b.date.getTime() - a.date.getTime()), [sessions]);
   
   const [currentSessionIndex, setCurrentSessionIndex] = useState(0);
 
