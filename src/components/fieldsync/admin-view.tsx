@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -74,6 +74,15 @@ export function AdminView() {
     }
   };
 
+  const upcomingSessions = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return sessions
+      .filter(session => session.date >= today)
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+  }, [sessions]);
+
   return (
     <Tabs defaultValue="manage" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
@@ -83,13 +92,13 @@ export function AdminView() {
       <TabsContent value="manage">
         <Card>
           <CardHeader>
-            <CardTitle>Existing Sessions</CardTitle>
-            <CardDescription>View, manage, and see registrations for all scheduled sessions.</CardDescription>
+            <CardTitle>Upcoming Sessions</CardTitle>
+            <CardDescription>View, manage, and see registrations for all upcoming sessions.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {sessions.length > 0 ? (
+            {upcomingSessions.length > 0 ? (
               <Accordion type="single" collapsible className="w-full">
-                {sessions.map(session => (
+                {upcomingSessions.map(session => (
                   <AccordionItem value={session.id} key={session.id}>
                     <AccordionTrigger>
                       <div className="flex justify-between w-full pr-4">
@@ -149,7 +158,7 @@ export function AdminView() {
                 ))}
               </Accordion>
             ) : (
-              <p className="text-center text-muted-foreground py-8">No sessions scheduled.</p>
+              <p className="text-center text-muted-foreground py-8">No upcoming sessions scheduled.</p>
             )}
           </CardContent>
         </Card>
