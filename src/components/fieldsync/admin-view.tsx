@@ -23,7 +23,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Badge } from '../ui/badge';
 
 const sessionSchema = z.object({
-  date: z.date({ required_error: 'A date is required.' }),
+  dates: z.array(z.date()).min(1, { message: 'Please select at least one date.' }),
   time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)\s-\s([01]\d|2[0-3]):([0-5]\d)$/, {
     message: 'Time must be in HH:MM - HH:MM format.',
   }),
@@ -36,18 +36,20 @@ export function AdminView() {
 
   const form = useForm<z.infer<typeof sessionSchema>>({
     resolver: zodResolver(sessionSchema),
-    defaultValues: { time: '' },
+    defaultValues: { dates: [], time: '' },
   });
 
   const handleCreateSession = (values: z.infer<typeof sessionSchema>) => {
     setIsSubmitting(true);
     setTimeout(() => {
-      createSession(values.date, values.time);
-      toast({
-        title: 'Session Created!',
-        description: `New session on ${format(values.date, 'MMMM d')} at ${values.time} is now available.`,
+      values.dates.forEach(date => {
+        createSession(date, values.time);
       });
-      form.reset({ time: '' });
+      toast({
+        title: `${values.dates.length} Session(s) Created!`,
+        description: `New sessions at ${values.time} are now available.`,
+      });
+      form.reset({ dates: [], time: '' });
       setIsSubmitting(false);
     }, 1000);
   };
@@ -155,32 +157,40 @@ export function AdminView() {
       <TabsContent value="create">
         <Card>
           <CardHeader>
-            <CardTitle>Create New Session</CardTitle>
-            <CardDescription>Set up a new practice session. Capacity is fixed at 6 teams.</CardDescription>
+            <CardTitle>Create New Session(s)</CardTitle>
+            <CardDescription>Set up new practice sessions. Capacity is fixed at 6 teams.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleCreateSession)} className="space-y-6">
                 <FormField
                   control={form.control}
-                  name="date"
+                  name="dates"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Session Date</FormLabel>
+                      <FormLabel>Session Date(s)</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
                               variant={"outline"}
-                              className={cn("w-[240px] pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
+                              className={cn("w-[240px] pl-3 text-left font-normal", !field.value?.length && "text-muted-foreground")}
                             >
-                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                              {field.value?.length
+                                ? field.value.length === 1
+                                  ? format(field.value[0], "PPP")
+                                  : `${field.value.length} dates selected`
+                                : <span>Pick one or more dates</span>}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}/>
+                          <Calendar
+                            mode="multiple"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} />
                         </PopoverContent>
                       </Popover>
                       <FormMessage />
@@ -205,7 +215,7 @@ export function AdminView() {
                 />
                 <Button type="submit" variant="destructive" disabled={isSubmitting}>
                   {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
-                  Create Session
+                  Create Session(s)
                 </Button>
               </form>
             </Form>
