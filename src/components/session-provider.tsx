@@ -22,7 +22,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const createSession = useCallback((date: Date, time: string) => {
     const newSession: Session = {
-      id: `ses_${new Date().getTime()}`,
+      id: `ses_${new Date().getTime()}_${Math.random().toString(36).slice(2)}`,
       date,
       time,
       capacity: 6,
