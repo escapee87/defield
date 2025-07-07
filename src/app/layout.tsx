@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/header";
 import { AuthProvider } from '@/components/auth-provider';
 import { SessionProvider } from '@/components/session-provider';
+import { CoachProvider } from '@/components/coach-provider';
 
 export const metadata: Metadata = {
   title: 'FieldSync',
@@ -24,15 +25,17 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background text-foreground">
         <AuthProvider>
-          <SessionProvider>
-            <div className="min-h-screen flex flex-col">
-              <Header />
-              <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {children}
-              </main>
-            </div>
-            <Toaster />
-          </SessionProvider>
+          <CoachProvider>
+            <SessionProvider>
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                  {children}
+                </main>
+              </div>
+              <Toaster />
+            </SessionProvider>
+          </CoachProvider>
         </AuthProvider>
       </body>
     </html>

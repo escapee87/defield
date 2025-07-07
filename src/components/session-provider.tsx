@@ -9,6 +9,7 @@ interface SessionContextType {
   createSession: (date: Date, time: string) => void;
   cancelSession: (sessionId: string) => 'cancelled' | 'removed';
   registerTeam: (sessionId: string, registrationDetails: Omit<Registration, 'id' | 'checkedIn'>) => void;
+  cancelRegistration: (sessionId: string, registrationId: string) => void;
   checkInTeam: (sessionId: string, registrationId: string) => string | undefined;
   fieldReports: FieldReport[];
   submitFieldReport: (data: Omit<FieldReport, 'id' | 'submittedAt'>) => void;
@@ -67,6 +68,20 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       );
   }, []);
 
+  const cancelRegistration = useCallback((sessionId: string, registrationId: string) => {
+    setSessions(prevSessions =>
+      prevSessions.map(session => {
+        if (session.id === sessionId) {
+          return {
+            ...session,
+            registrations: session.registrations.filter(reg => reg.id !== registrationId),
+          };
+        }
+        return session;
+      })
+    );
+  }, []);
+
   const checkInTeam = useCallback((sessionId: string, registrationId: string): string | undefined => {
     let teamName: string | undefined = undefined;
     setSessions(prevSessions =>
@@ -96,7 +111,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     setFieldReports(prev => [...prev, newReport]);
   }, []);
 
-  const value = { sessions, createSession, cancelSession, registerTeam, checkInTeam, fieldReports, submitFieldReport };
+  const value = { sessions, createSession, cancelSession, registerTeam, checkInTeam, fieldReports, submitFieldReport, cancelRegistration };
 
   return (
     <SessionContext.Provider value={value}>

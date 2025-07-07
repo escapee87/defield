@@ -5,9 +5,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Clock, Users, User, Mail, Phone, Loader2, ArrowRight } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Users, User, Mail, Phone, Loader2, ArrowRight, Trash2 } from 'lucide-react';
 
 import { useSessions } from '@/hooks/use-sessions';
+import { useCoach } from '@/hooks/use-coach';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -15,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +29,8 @@ const registrationSchema = z.object({
 });
 
 export function CoachView() {
-  const { sessions, registerTeam } = useSessions();
+  const { sessions, registerTeam, cancelRegistration } = useSessions();
+  const { coach, setCoach } = useCoach();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -46,22 +49,37 @@ export function CoachView() {
     // Simulate API call
     setTimeout(() => {
       registerTeam(sessionId, values);
+      setCoach(values);
 
       toast({
         title: "Registration Successful!",
         description: `Your team, ${values.teamName}, is registered. A confirmation email has been sent.`,
       });
       setIsSubmitting(false);
+      // Close all dialogs by simulating an Escape key press.
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
       form.reset();
     }, 1000);
   };
   
+  const handleCancelRegistration = (sessionId: string, registrationId: string) => {
+    cancelRegistration(sessionId, registrationId);
+    toast({
+        title: 'Registration Cancelled',
+        description: 'Your team registration has been successfully cancelled.',
+    });
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {sessions.map(session => {
         const isFull = session.registrations.length >= session.capacity;
         const progressValue = (session.registrations.length / session.capacity) * 100;
         const isCancelled = session.status === 'cancelled';
+        
+        const currentUserRegistration = coach
+          ? session.registrations.find(reg => reg.coachEmail === coach.coachEmail)
+          : undefined;
         
         return (
           <Dialog key={session.id} onOpenChange={(open) => !open && form.reset()}>
@@ -94,7 +112,7 @@ export function CoachView() {
                         <h4 className="text-sm font-medium mb-2 text-foreground">Registered Teams:</h4>
                         <div className="flex flex-wrap gap-1">
                           {session.registrations.map(reg => (
-                            <Badge key={reg.id} variant="secondary" className="font-normal">{reg.teamName}</Badge>
+                            <Badge key={reg.id} variant={reg.coachEmail === coach?.coachEmail ? "default" : "secondary"} className="font-normal">{reg.teamName}</Badge>
                           ))}
                         </div>
                       </div>
@@ -102,12 +120,36 @@ export function CoachView() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <DialogTrigger asChild>
-                    <Button variant={isFull || isCancelled ? "secondary" : "destructive"} disabled={isFull || isCancelled} className="w-full">
-                      {isCancelled ? 'Cancelled' : isFull ? 'Session Full' : 'Register Team'}
-                      {!isFull && !isCancelled && <ArrowRight className="ml-2 h-4 w-4" />}
-                    </Button>
-                  </DialogTrigger>
+                  {currentUserRegistration ? (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                         <Button variant="outline" className="w-full" disabled={isCancelled}>
+                            <Trash2 className="mr-2 h-4 w-4" /> Cancel Registration
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will cancel your registration for the session on {format(session.date, 'MMMM d')}. You can re-register if spots are still available.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Back</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleCancelRegistration(session.id, currentUserRegistration.id)}>
+                            Confirm Cancellation
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  ) : (
+                    <DialogTrigger asChild>
+                      <Button variant={isFull || isCancelled ? "secondary" : "destructive"} disabled={isFull || isCancelled} className="w-full">
+                        {isCancelled ? 'Cancelled' : isFull ? 'Session Full' : 'Register Team'}
+                        {!isFull && !isCancelled && <ArrowRight className="ml-2 h-4 w-4" />}
+                      </Button>
+                    </DialogTrigger>
+                  )}
                 </CardFooter>
               </div>
 
