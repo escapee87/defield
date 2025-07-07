@@ -15,10 +15,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const reportSchema = z.object({
   sessionId: z.string().min(1, { message: "A session must be selected." }),
+  registrationId: z.string().min(1, { message: "You must select your team to submit a report." }),
   rating: z.number().min(1, { message: "Please select a star rating." }).max(5),
   comments: z.string().max(500, { message: "Comments cannot exceed 500 characters." }).optional(),
 });
@@ -30,7 +31,7 @@ export function FieldReportForm() {
   const [hoverRating, setHoverRating] = useState(0);
 
   const pastOrCurrentSessions = sessions
-    .filter(session => new Date(session.date) <= new Date())
+    .filter(session => new Date(session.date) <= new Date() && session.registrations.length > 0)
     .sort((a, b) => b.date.getTime() - a.date.getTime());
   
   const [currentSessionIndex, setCurrentSessionIndex] = useState(0);
@@ -38,7 +39,8 @@ export function FieldReportForm() {
   const form = useForm<z.infer<typeof reportSchema>>({
     resolver: zodResolver(reportSchema),
     defaultValues: {
-      sessionId: pastOrCurrentSessions.length > 0 ? pastOrCurrentSessions[0].id : '',
+      sessionId: '',
+      registrationId: '',
       rating: 0,
       comments: '',
     },
@@ -47,6 +49,9 @@ export function FieldReportForm() {
   useEffect(() => {
     if (pastOrCurrentSessions.length > 0) {
       form.setValue('sessionId', pastOrCurrentSessions[currentSessionIndex].id, { shouldValidate: true });
+      form.resetField('registrationId', { defaultValue: '' });
+    } else {
+        form.reset({ sessionId: '', registrationId: '', rating: 0, comments: '' });
     }
   }, [currentSessionIndex, pastOrCurrentSessions, form]);
 
@@ -63,6 +68,7 @@ export function FieldReportForm() {
       });
       form.reset({
         sessionId: pastOrCurrentSessions.length > 0 ? pastOrCurrentSessions[0].id : '',
+        registrationId: '',
         rating: 0,
         comments: '',
       });
@@ -83,7 +89,7 @@ export function FieldReportForm() {
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle>Field Condition Report</CardTitle>
-        <CardDescription>Select a past session and rate the field conditions.</CardDescription>
+        <CardDescription>Select a past session and your team to rate the field conditions.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -112,24 +118,40 @@ export function FieldReportForm() {
                       <span className="sr-only">Next Session</span>
                     </Button>
                   </div>
-                  <div className="pt-2">
-                    <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-                      <Users className="h-4 w-4" /> Teams in this session:
-                    </h4>
-                    {selectedSession.registrations.length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {selectedSession.registrations.map(reg => (
-                          <Badge key={reg.id} variant="secondary">{reg.teamName}</Badge>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">No teams were registered for this session.</p>
-                    )}
-                  </div>
+                   <FormField
+                      control={form.control}
+                      name="registrationId"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3 pt-4">
+                          <FormLabel className="flex items-center gap-2 font-medium">
+                             <Users className="h-4 w-4" /> Select Your Team
+                          </FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              value={field.value}
+                              className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2"
+                            >
+                              {selectedSession.registrations.map((reg) => (
+                                <FormItem key={reg.id} className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value={reg.id} />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    {reg.teamName}
+                                  </FormLabel>
+                                </FormItem>
+                              ))}
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                 </div>
               ) : (
                 <div className="text-center text-muted-foreground p-4 border border-dashed rounded-md">
-                  <p>No past sessions available to report on.</p>
+                  <p>No past sessions with registered teams available to report on.</p>
                 </div>
               )}
               <FormField control={form.control} name="sessionId" render={() => (<FormItem><FormMessage /></FormItem>)} />
