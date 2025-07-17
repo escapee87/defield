@@ -97,6 +97,26 @@ export default function Home() {
             </Button>
           </CardContent>
         </Card>
+        <Card className="hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+          <CardHeader>
+            <div className="flex justify-center mb-4">
+              <div className="bg-primary/10 p-4 rounded-full">
+                <FileText className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-center">
+              FAQ
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex-grow flex flex-col">
+            <CardDescription className="text-center mb-6 flex-grow">
+              Submit a report on field conditions, ratings, and any issues.
+            </CardDescription>
+            <Button asChild className="w-full">
+              <Link href="/faq">Submit a Report <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

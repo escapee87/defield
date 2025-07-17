@@ -12,6 +12,7 @@ const navItems = [
   { href: '/admin', label: 'Admin' },
   { href: '/monitor', label: 'Monitor' },
   { href: '/report', label: 'Report' },
+  { href: '/faq', label: 'FAQ' },
 ];
 
 export function Header() {

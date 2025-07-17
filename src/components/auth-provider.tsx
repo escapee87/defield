@@ -12,7 +12,7 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const ADMIN_PASSWORD = "password123"; // This is insecure. For demo purposes only.
+const ADMIN_PASSWORD = "WRT123"; // This is insecure. For demo purposes only.
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
