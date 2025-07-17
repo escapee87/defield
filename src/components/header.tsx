@@ -38,7 +38,7 @@ export function Header() {
                 <line x1="9" x2="9" y1="21" y2="9"></line>
             </svg>
            </div>
-          <span className="font-bold text-lg text-foreground">FieldSync</span>
+          <span className="font-bold text-lg text-foreground">Walton Robotics Destination Engineering</span>
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2">
           {navItems.map((item) => (
