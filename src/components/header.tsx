@@ -28,17 +28,23 @@ export function Header() {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="w-6 h-6 text-primary"
             >
-                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
-                <line x1="3" x2="21" y1="9" y2="9"></line>
-                <line x1="9" x2="9" y1="21" y2="9"></line>
+                {/* <line x1="2" x2="22" y1="2" y2="2"></line>
+                <line x1="2" x2="22" y1="22" y2="22"></line>
+                <line x1="2" x2="2" y1="2" y2="22"></line>
+                <line x1="22" x2="22" y1="2" y2="22"></line> */}
+
+                <line x1="2" x2="7" y1="2" y2="22"></line>
+                <line x1="7" x2="12" y1="22" y2="6"></line>
+                <line x1="12" x2="17" y1="6" y2="22"></line>
+                <line x1="17" x2="22" y1="22" y2="2"></line>
             </svg>
            </div>
-          <span className="font-bold text-lg text-foreground">Walton Robotics Destination Engineering</span>
+          <span className="font-bold text-lg text-foreground">Walton Robotics DE</span>
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2">
           {navItems.map((item) => (
