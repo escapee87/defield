@@ -8,7 +8,7 @@ export default function Home() {
     <div className="flex flex-col items-center text-center">
       <div className="max-w-3xl py-12 md:py-24">
         <h1 className="text-4xl md:text-6xl font-bold tracking-tighter mb-4 font-headline">
-          Welcome to FieldSync
+          Welcome to the Walton Robotics Destination Engineering App
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
           The all-in-one solution for managing team practice sessions.
