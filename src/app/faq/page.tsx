@@ -1,3 +1,5 @@
+import { FAQView } from '@/components/fieldsync/faq-view';
+
 export default function FAQPage() {
   return (
     <div>
@@ -5,6 +7,7 @@ export default function FAQPage() {
         <h1 className="text-3xl font-bold tracking-tight">Available Sessions</h1>
         <p className="text-muted-foreground">Find a practice slot and register your team.</p>
       </div>
+      <FAQView />
     </div>
   );
 }

@@ -34,11 +34,6 @@ export function Header() {
                 strokeLinejoin="round"
                 className="w-6 h-6 text-primary"
             >
-                {/* <line x1="2" x2="22" y1="2" y2="2"></line>
-                <line x1="2" x2="22" y1="22" y2="22"></line>
-                <line x1="2" x2="2" y1="2" y2="22"></line>
-                <line x1="22" x2="22" y1="2" y2="22"></line> */}
-
                 <line x1="2" x2="7" y1="2" y2="22"></line>
                 <line x1="7" x2="12" y1="22" y2="6"></line>
                 <line x1="12" x2="17" y1="6" y2="22"></line>
