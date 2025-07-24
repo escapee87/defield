@@ -83,11 +83,21 @@ export function AdminView() {
       .sort((a, b) => a.date.getTime() - b.date.getTime());
   }, [sessions]);
 
+  const pastSessions = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return sessions
+      .filter(session => session.date < today)
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+  }, [sessions]);
+
   return (
     <Tabs defaultValue="manage" className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="manage">Manage Sessions</TabsTrigger>
         <TabsTrigger value="create">Create Session</TabsTrigger>
+        <TabsTrigger value="history">Session History</TabsTrigger>
       </TabsList>
       <TabsContent value="manage">
         <Card>
@@ -228,6 +238,61 @@ export function AdminView() {
                 </Button>
               </form>
             </Form>
+          </CardContent>
+        </Card>
+      </TabsContent>
+      <TabsContent value="history">
+        <Card>
+          <CardHeader>
+            <CardTitle>Past Sessions</CardTitle>
+            <CardDescription>View and see registrations for all past sessions.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {pastSessions.length > 0 ? (
+              <Accordion type="single" collapsible className="w-full">
+                {pastSessions.map(session => (
+                  <AccordionItem value={session.id} key={session.id}>
+                    <AccordionTrigger>
+                      <div className="flex justify-between w-full pr-4">
+                        <div className="flex items-center gap-4">
+                          <CalendarIcon className="h-5 w-5 text-primary" />
+                          <div className="text-left">
+                            <p className="font-semibold">{format(session.date, 'EEEE, MMMM d')}</p>
+                            <p className="text-sm text-muted-foreground">{session.time}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          {session.status === 'cancelled' && (
+                            <Badge variant="outline" className="text-destructive border-destructive">Cancelled</Badge>
+                          )}
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Users className="h-4 w-4" />
+                            <span>{session.registrations.length} / {session.capacity}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="p-4 bg-muted/50 rounded-md">
+                        {session.registrations.length > 0 ? (
+                          <ul className="space-y-2">
+                            {session.registrations.map(reg => (
+                              <li key={reg.id} className="text-sm">
+                                <strong>{reg.teamName}</strong> - {reg.coachName} ({reg.coachEmail})
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">No teams registered.</p>
+                        )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">No sessions have been scheduled.</p>
+            )}
           </CardContent>
         </Card>
       </TabsContent>
